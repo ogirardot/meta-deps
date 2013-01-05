@@ -1,11 +1,13 @@
 <html>
 	<head>
     <meta http-equiv="X-UA-Compatible" content="chrome=1, IE=edge">
+    <script src="lzma.js"></script>
+    <script src="BinFileReader.js"></script>
 		<script type="text/javascript" src="sigma.min.js"></script>
     <script type="text/javascript" src="sigma.parseGexf.js" ></script>
     <style type="text/css" media="all">
     body {
-      padding-top: 60px;
+      padding-top: 20px;
       padding-bottom: 40px;
     }
   /* sigma.js context : */
@@ -30,8 +32,62 @@
   }  </style>
 		</head>
 		<body>
-      <div id="sigma-example"  style="background-color:#333;width:1200px;height:600px"></div>
+      <h1>PyPi interactive dependency graph (wait for full loading of the graph)</h1>
+      <h3>This graph has been spatialized and coloured using <a href="http://www.gephi.org">Gephi</a> and some modifications were done to be better integrated with <a href="http://sigmajs.org/">SigmaJS</a>.</h3>
+
+      <div id="sigma-example"  style="background-color:#333;width:1200px;height:800px"></div>
+      <p><b>Disclamer</b> : The data presented here is a work in progress, this whole graph analyses dependencies between Python packages on PyPi and those dependencies have been extracted from the <b>setup.py</b> files within their distributions.
+        This method is not the most accurate one, therefore :
+        <ul>
+          <li>If a link between two dependencies has been created, there is no doubt about its existence;</li>
+          <li>but if no link has been created for a node, we have no evidence that the mentioned library doesn't really depends on something else. It's just not mentioned.</li>
+        </ul>
+        In addition to that, the dataset presented here contains only <b>16536</b> packages on the <b>26923</b> registered on PyPi. <br/>The reasons for that are that some packages are on PyPi but no releases are associated to them, and many have complex build procedures that were not handled by the program i used.
+        <br/>
+        In other words, <b>It's a work in progress</b> take it as such. 
+      </p>
+      The full code is available on <a href="https://github.com/ssaboum/meta-deps">GitHub</a>.
       <script>
+      function StringtoXML(text){
+                if (window.ActiveXObject){
+                  var doc=new ActiveXObject('Microsoft.XMLDOM');
+                  doc.async='false';
+                  doc.loadXML(text);
+                } else {
+                  var parser=new DOMParser();
+                  var doc=parser.parseFromString(text,'text/xml');
+                }
+                return doc;
+            }
+            function base64_decode(text) {
+  var dwOctets = 0;
+  var nbChars = 0;
+  var ret = "";
+  var b;
+
+  for (i = 0; i < text.length; i++) {
+    b = text.charCodeAt(i);
+    if (b == 61) break;
+    if (b > 32) {
+      dwOctets <<= 6;
+      if (65 <= b && b <= 90) dwOctets += b - 65;
+      else if (97 <= b && b <= 122) dwOctets += b - 71;
+      else if (48 <= b && b <= 57) dwOctets += b + 4;
+      else if (b == 43) dwOctets += 62;
+      else if (b == 47) dwOctets += 63;
+      if (++nbChars == 4) {
+        for (j = 0; j < 3; j++) {
+          ret += String.fromCharCode((dwOctets & 0x00FF0000) >> 16);
+          dwOctets <<= 8;
+        }
+        dwOctets = 0;
+        nbChars = 0;
+      }
+    }
+  }
+
+  return ret;
+}
   var sigInst = sigma.init(document.getElementById('sigma-example')).drawingProperties({
     defaultLabelColor: '#fff',
     defaultLabelSize: 14,
@@ -50,10 +106,21 @@
  
   // Parse a GEXF encoded file to fill the graph
   // (requires "sigma.parseGexf.js" to be included)
-  sigInst.parseGexf('pypi-graph.gexf');
- 
-  // Draw the graph :
-  sigInst.draw();
+  var byte_array_reader = new BinFileReader('pypi-graph.gexf.lzma');
+  var byte_array_file = []
+  var ssize = byte_array_reader.getFileSize()
+  for (var i=0; i<ssize; i++) {
+    byte_array_file[i] = byte_array_reader.readNumber();
+  }
+  my_lzma = new LZMA("lzma_worker.js")
+  my_lzma.decompress(byte_array_file, function (result) {
+            sigInst.parseGexf(StringtoXML(result));
+            // Draw the graph :
+            sigInst.draw();
+        }, function (percent) {
+            /// Decompressing progress code goes here.
+            document.title = "Decompressing: " + (percent * 100) + "%";
+        });
 </script>
 	</body>
 </html>
