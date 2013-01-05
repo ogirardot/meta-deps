@@ -30,6 +30,7 @@
 		</head>
 		<body>
       <h1>PyPi dependency graph</h1>
+      <h3>This graph has been spatialized and coloured using <a href="http://www.gephi.org">Gephi</a> and some modifications were done to be better integrated with <a href="http://sigmajs.org/">SigmaJS</a>.</h3>
       <div id="sigma-example"  style="background-color:#333;width:1200px;height:600px"></div>
       <p><b>Disclamer</b> : The data presented here is a work in progress, this whole graph analyses dependencies between Python packages on PyPi and those dependencies have been extracted from the <b>setup.py</b> files within their distributions.
         This method is not the most accurate one, therefore :
@@ -41,6 +42,7 @@
         <br/>
         In other words, <b>It's a work in progress</b> take it as such. 
       </p>
+      The full code is available on <a href="https://github.com/ssaboum/meta-deps">GitHub</a>.
       <script>
   var sigInst = sigma.init(document.getElementById('sigma-example')).drawingProperties({
     defaultLabelColor: '#fff',
