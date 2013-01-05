@@ -4,7 +4,7 @@
     <script type="text/javascript" src="sigma.parseGexf.js" ></script>
     <style type="text/css" media="all">
     body {
-      padding-top: 60px;
+      padding-top: 20px;
       padding-bottom: 40px;
     }
   /* sigma.js context : */
@@ -29,7 +29,18 @@
   }  </style>
 		</head>
 		<body>
+      <h1>PyPi dependency graph</h1>
       <div id="sigma-example"  style="background-color:#333;width:1200px;height:600px"></div>
+      <p><b>Disclamer</b> : The data presented here is a work in progress, this whole graph analyses dependencies between Python packages on PyPi and those dependencies have been extracted from the <b>setup.py</b> files within their distributions.
+        This method is not the most accurate one, therefore :
+        <ul>
+          <li>If a link between two dependencies has been created, there is no doubt about its existence;</li>
+          <li>but if no link has been created for a node, we have no evidence that the mentioned library doesn't really depends on something else. It's just not mentioned.</li>
+        </ul>
+        In addition to that, the dataset presented here contains only <b>16536</b> packages on the <b>26923</b> registered on PyPi. <br/>The reasons for that are that some packages are on PyPi but no releases are associated to them, and many have complex build procedures that were not handled by the program i used.
+        <br/>
+        In other words, <b>It's a work in progress</b> take it as such. 
+      </p>
       <script>
   var sigInst = sigma.init(document.getElementById('sigma-example')).drawingProperties({
     defaultLabelColor: '#fff',
